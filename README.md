@@ -1,75 +1,77 @@
-# project-nimbus
-Cloud-native AWS ETL pipeline: S3 → Glue (PySpark) → Redshift, orchestrated via Apache Airflow with partition pruning, incremental loading, and IAM security.
+☁️ Project Nimbus
+Cloud-native AWS End-to-End ETL Data Pipeline
 
-What is Project Nimbus?
-Project Nimbus is a fully automated, cloud-native ETL pipeline built on AWS that takes raw CSV data, transforms it into clean, partitioned Parquet files, loads it into a Redshift data warehouse, and orchestrates the entire flow via Apache Airflow — with zero manual intervention.
+Raw data in. Analytics-ready data out. Fully automated, zero manual intervention.
+
+
+📌 What is Project Nimbus?
+Project Nimbus is a fully automated, cloud-native ETL pipeline built on AWS. It takes raw CSV data, transforms it into clean partitioned Parquet files using PySpark, loads it into a Redshift data warehouse, and orchestrates the entire flow via Apache Airflow.
 Built to mirror real-world data engineering pipelines at scale.
 
-Architecture
+🏗️ Architecture
 Raw CSV Files
-     │
-     ▼
-┌─────────────┐
-│  AWS S3     │  ← Raw Zone (landing bucket)
-│  (Raw)      │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────────┐
-│  AWS Glue + PySpark     │  ← Transform Layer
-│  • Null handling        │     - Schema enforcement
-│  • Deduplication        │     - Type casting
-│  • Schema validation    │     - Parquet conversion
-└──────────┬──────────────┘
+      │
+      ▼
+┌─────────────────┐
+│   AWS S3 (Raw)  │  ← Landing zone
+└────────┬────────┘
+         │
+         ▼
+┌──────────────────────────┐
+│   AWS Glue + PySpark     │  ← Transform layer
+│   - Null handling        │
+│   - Deduplication        │
+│   - Type casting         │
+│   - Schema validation    │
+│   - Parquet conversion   │
+└──────────┬───────────────┘
            │
            ▼
-┌─────────────┐
-│  AWS S3     │  ← Curated Zone (clean, partitioned Parquet)
-│  (Curated)  │     Partitioned by year / month / day
-└──────┬──────┘
-       │
-       ▼
-┌──────────────────┐
-│ Amazon Redshift  │  ← Analytics Warehouse
-│ COPY + Manifest  │     Incremental loading, no full reloads
-└──────────────────┘
-       ▲
-       │
-┌──────────────────┐
-│ Apache Airflow   │  ← Orchestration Layer
-│ DAGs + Retries   │     Task alerting, SLA monitoring
-└──────────────────┘
-       ▲
-       │
-┌──────────────────┐
-│   AWS IAM        │  ← Security Layer
-│ Least-Privilege  │     Role-based access per pipeline stage
-└──────────────────┘
+┌──────────────────────┐
+│  AWS S3 (Curated)    │  ← Clean, partitioned Parquet
+│  year / month / day  │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│   Amazon Redshift    │  ← Analytics warehouse
+│   COPY + Manifest    │     Incremental loading
+└──────────────────────┘
 
-Tech Stack
-LayerTechnologyCloud PlatformAWSStorageAmazon S3 (raw + curated zones)TransformationAWS Glue, PySparkWarehouseAmazon RedshiftOrchestrationApache AirflowLanguagePython 3.xFile FormatParquet (snappy compressed)SecurityAWS IAM (least-privilege roles)
+┌──────────────────────┐
+│   Apache Airflow     │  ← Orchestration
+│   DAGs + Retries     │     Task alerting, SLA monitoring
+└──────────────────────┘
 
-Key Features
-Multi-Zone S3 Architecture
+┌──────────────────────┐
+│   AWS IAM            │  ← Security
+│   Least-Privilege    │     Role-based access per stage
+└──────────────────────┘
+
+🛠️ Tech Stack
+LayerTechnologyCloud PlatformAWSStorageAmazon S3 (raw + curated zones)TransformationAWS Glue + PySparkWarehouseAmazon RedshiftOrchestrationApache AirflowLanguagePython 3.xFile FormatParquet (snappy compressed)SecurityAWS IAM (least-privilege roles)
+
+✨ Key Features
+🗂️ Multi-Zone S3 Architecture
 Data lands in a raw zone untouched, gets transformed, and moves to a curated zone — keeping raw data always recoverable and transformations fully auditable.
-PySpark Transformation Layer
+⚡ PySpark Transformation Layer
 Handles null imputation, deduplication, type casting, and schema enforcement at scale — designed to process large volumes without bottlenecks.
-Partition Pruning Strategy
+📂 Partition Pruning Strategy
 S3 data is partitioned by year/month/day — enabling Redshift and Athena to skip irrelevant partitions entirely, drastically reducing query scan costs on time-series data.
-Incremental Redshift Loading
+🔄 Incremental Redshift Loading
 Uses COPY commands with manifest files — only new data gets loaded, no expensive full-table reloads.
-Airflow DAG Orchestration
-Full pipeline is orchestrated as an Airflow DAG with:
+🎛️ Airflow DAG Orchestration
+Full pipeline orchestrated as an Airflow DAG with:
 
 Configurable retry logic per task
 Task-level failure alerting
 SLA breach notifications
 Clean dependency management between stages
 
-IAM Security
+🔒 IAM Security
 Every pipeline stage has its own IAM role with least-privilege permissions — no over-permissioned service accounts, no shared credentials.
 
-Project Structure
+📁 Project Structure
 project-nimbus/
 │
 ├── dags/
@@ -89,7 +91,7 @@ project-nimbus/
 │
 └── README.md
 
-Pipeline Flow
+🔁 Pipeline Flow
 1. Raw CSV lands in S3 (raw zone)
 2. Airflow DAG triggers on schedule
 3. Glue job spins up PySpark session
@@ -98,17 +100,12 @@ Pipeline Flow
 6. Redshift COPY loads new partitions incrementally via manifest
 7. Airflow marks DAG success / fires alert on failure
 
-Why Parquet?
+🤔 Why Parquet?
+FeatureBenefitColumnar storageQueries only scan the columns they needSnappy compression~75% smaller than raw CSVPartition-awareWorks seamlessly with Redshift Spectrum and AthenaSchema embeddedNo separate schema registry needed
 
-Columnar storage → queries only scan columns they need
-Snappy compression → ~75% smaller than raw CSV
-Partition-aware → works seamlessly with Redshift Spectrum and Athena
-Schema embedded → no separate schema registry needed for basic pipelines
-
-
-Setup & Deployment
+🚀 Setup & Deployment
 bash# Clone the repo
-git clone https://github.com/muskanbhalla/project-nimbus
+git clone https://github.com/muskanbhalla2021-qul/project-nimbus
 cd project-nimbus
 
 # Configure AWS credentials
@@ -122,22 +119,21 @@ airflow db init
 airflow scheduler &
 airflow webserver
 
-What I Learned
+📚 What I Learned
 
 Designing multi-zone S3 architectures for data lake patterns
 Writing production PySpark jobs inside AWS Glue
 Partition pruning strategies for cost-optimised querying
 Building reliable, retry-safe Airflow DAGs
-Applying IAM least-privilege security to pipeline infrastructure
+Applying IAM least-privilege security across pipeline infrastructure
 Incremental loading patterns in Redshift using manifest files
 
 
-Status
+📊 Status
 
 🚧 In Progress — Core pipeline functional. Currently adding monitoring layer and expanding transformation logic for multi-source ingestion.
 
 
-Author -
-Muskan Bhalla
-Cloud & Data Engineer
+👩‍💻 Author
+Muskan Bhalla — Cloud & Data Engineer
 muskanbhalla2021@gmail.com
