@@ -176,5 +176,5 @@ airflow webserver
 **Muskan Bhalla** — Cloud & Data Engineer
 muskanbhalla2021@gmail.com
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://linkedin.com/in/muskanbhalla2021-qul)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat&logo=github)](https://github.com/muskanbhalla2021-qul)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)]([https://linkedin.com/in/muskanbhalla2021-qul](https://www.linkedin.com/in/muskan-bhalla-975a65222/))
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat&logo=github)]([https://github.com/muskanbhalla2021-qul](https://github.com/muskanbhalla2021-qul))
